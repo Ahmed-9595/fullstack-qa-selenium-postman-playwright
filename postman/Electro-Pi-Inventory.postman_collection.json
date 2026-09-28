@@ -1,0 +1,81 @@
+{
+  "info": {
+    "name": "Electro Pi - Inventory API",
+    "_postman_id": "electro-pi-inventory-assessment",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Authentication - Get Token",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Login Successful - 200 OK', function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "// Save dynamic token directly into Environment variables",
+              "const response = pm.response.json();",
+              "if (response.token) {",
+              "  pm.environment.set('token', response.token);",
+              "}"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"{{username}}\",\n  \"password\": \"{{password}}\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/auth/login",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "auth", "login"]
+        }
+      }
+    },
+    {
+      "name": "2. Create Inventory Item",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status is 201 Created', function () {",
+              "  pm.response.to.have.status(201);",
+              "});",
+              "",
+              "const body = pm.response.json();",
+              "pm.test('Returned SKU is MS-001', function () {",
+              "  pm.expect(body.sku).to.eql('MS-001');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"item_name\": \"Wireless Mouse\",\n  \"sku\": \"MS-001\",\n  \"quantity\": 50,\n  \"price\": 25.00,\n  \"category_id\": 3\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/inventory/items",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "v1", "inventory", "items"]
+        }
+      }
+    }
+  ]
+}
